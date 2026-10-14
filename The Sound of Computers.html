@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Sound of Computers</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config={theme:{extend:{colors:{bg:'#0F172A',card:'#1E293B',line:'#334155',cy:'#06B6D4',vi:'#8B5CF6',mut:'#94A3B8',ink:'#F8FAFC'},fontFamily:{mono:['ui-monospace','SFMono-Regular','Menlo','Consolas','monospace']}}}}</script>
+<style>
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:5rem}
+body{background:#0F172A;color:#94A3B8;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+:focus-visible{outline:2px solid #06B6D4;outline-offset:2px}
+.btn{border-radius:.5rem;padding:.5rem 1rem;font-weight:600;font-size:.875rem;transition:.15s}
+.btn-p{background:#06B6D4;color:#0F172A}.btn-p:hover{background:#22d3ee}
+.btn-o{border:1px solid #334155;color:#F8FAFC}.btn-o:hover{border-color:#06B6D4;color:#06B6D4}
+.node{width:3.5rem;height:3.5rem;border-radius:9999px;border:2px solid #334155;background:#0F172A;color:#F8FAFC;font-weight:700;transition:.15s}
+.node:not(:disabled):hover{border-color:#06B6D4}
+.node.done{background:#06B6D4;color:#0F172A;border-color:#06B6D4}
+.node:disabled{opacity:.4;cursor:not-allowed}
+input[type=range]{accent-color:#06B6D4;width:100%}
+textarea{tab-size:2}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur">
+  <div class="max-w-6xl mx-auto flex items-center justify-between px-4 h-16">
+    <a href="#top" class="flex items-center gap-2 text-ink font-bold">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true" fill="#06B6D4"><rect x="2" y="10" width="3" height="6" rx="1.5"/><rect x="7" y="5" width="3" height="16" rx="1.5"/><rect x="12" y="1" width="3" height="24" rx="1.5" fill="#8B5CF6"/><rect x="17" y="7" width="3" height="12" rx="1.5"/><rect x="22" y="11" width="3" height="4" rx="1.5"/></svg>
+      <span class="flex flex-col leading-tight"><span class="text-sm sm:text-base">The Sound of Computers</span><span class="hidden sm:block text-[10px] font-normal text-mut">A non-profit organization created by Yunoo Sung.</span></span>
+    </a>
+    <nav class="hidden md:flex gap-6 text-sm" aria-label="Main">
+      <a class="hover:text-ink" href="#playground">Code Playground</a>
+      <a class="hover:text-ink" href="#paths">Learning Paths</a>
+      <a class="hover:text-ink" href="#lab">Live Audio Lab</a>
+      <a class="hover:text-ink" href="#tools">Quick Tools</a>
+      <a class="hover:text-ink" href="#about">About</a>
+    </nav>
+    <a href="#playground" class="btn btn-p">Launch Playground</a>
+  </div>
+</header>
+
+<main id="top">
+<section class="max-w-4xl mx-auto px-4 pt-16 pb-14 text-center">
+  <span class="inline-block text-xs font-mono text-vi border border-vi/40 bg-vi/10 rounded-full px-3 py-1">[ FREE &amp; OPEN-SOURCE CREATIVE CODING HUB ]</span>
+  <h1 class="mt-6 text-3xl sm:text-5xl font-extrabold text-ink leading-tight">Decode the Physics, Code, and Engineering Behind Everyday Sound.</h1>
+  <p class="mt-4"><span class="inline-block text-sm text-ink border border-line bg-card rounded-full px-4 py-1.5">🌱 A non-profit organization created by <b class="text-cy">Yunoo Sung</b>.</span></p>
+  <p class="mt-5 text-base sm:text-lg max-w-2xl mx-auto">Learn how to program sound engines, optimize your audio gear, and explore acoustic wave physics through interactive browser tools and bite-sized lessons.</p>
+  <div class="mt-8 flex flex-wrap gap-3 justify-center">
+    <a href="#playground" class="btn btn-p">Start Coding Sound</a>
+    <a href="#paths" class="btn btn-o">Explore Learning Paths</a>
+  </div>
+</section>
+
+<!-- PLAYGROUND -->
+<section id="playground" class="max-w-6xl mx-auto px-4 py-12">
+  <h2 class="text-2xl sm:text-3xl font-bold text-ink">Code the Sound</h2>
+  <p class="mt-2 mb-6">Edit the Web Audio API code, press Run, and watch the waveform. Variables available: <code class="text-vi font-mono">ctx</code>, <code class="text-vi font-mono">out</code>, <code class="text-vi font-mono">setInfo()</code>, <code class="text-vi font-mono">onStop()</code>.</p>
+  <div class="grid lg:grid-cols-2 gap-4">
+    <div class="bg-card border border-line rounded-xl p-4 flex flex-col">
+      <label for="tpl" class="text-xs text-mut mb-1">Template</label>
+      <select id="tpl" class="bg-bg border border-line text-ink rounded-lg p-2 text-sm mb-3">
+        
+        <option value="0">01. Hello World (440Hz Sine Wave)</option>
+        <option value="1">02. Custom Synthesizer &amp; Wave Types (Sine, Square, Saw, Triangle)</option>
+        <option value="2">03. Code a Focus White-Noise Generator</option>
+      </select>
+      <label for="code" class="sr-only">Code editor</label>
+      <textarea id="code" spellcheck="false" class="font-mono text-sm bg-bg text-ink border border-line rounded-lg p-3 h-72 resize-y w-full"></textarea>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <button id="run" class="btn btn-p">▶ Run Code</button>
+        <button id="stop" class="btn btn-o">⏹ Stop Audio</button>
+        <button id="reset" class="btn btn-o">🔄 Reset Code</button>
+      </div>
+      <p id="err" class="mt-2 text-sm text-red-400 font-mono" role="alert"></p>
+    </div>
+    <div class="bg-card border border-line rounded-xl p-4">
+      <canvas id="viz" class="w-full rounded-lg bg-bg border border-line" width="640" height="320" role="img" aria-label="Live audio waveform"></canvas>
+      <dl class="grid grid-cols-3 gap-3 mt-4 text-center">
+        <div class="bg-bg border border-line rounded-lg p-3"><dt class="text-xs">Frequency</dt><dd id="rF" class="text-cy font-mono font-bold">— Hz</dd></div>
+        <div class="bg-bg border border-line rounded-lg p-3"><dt class="text-xs">Wave Shape</dt><dd id="rW" class="text-cy font-mono font-bold">—</dd></div>
+        <div class="bg-bg border border-line rounded-lg p-3"><dt class="text-xs">Volume Gain</dt><dd id="rG" class="text-cy font-mono font-bold">—</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ANYWHERE -->
+<section id="anywhere" class="max-w-6xl mx-auto px-4 py-8">
+  <h2 class="text-2xl sm:text-3xl font-bold text-ink">🚀 Try Your Code Anywhere</h2>
+  <p class="mt-2 mb-6">Your Web Audio code is just JavaScript, so it runs in any browser. Here is a free way to test it outside this site. Keep your volume low, and remember browsers only play sound after you click or press something.</p>
+  <div class="grid lg:grid-cols-2 gap-4">
+    <div class="bg-card border border-line rounded-xl p-4 min-w-0">
+      <h3 class="text-ink font-semibold">🧪 Test Your Code in an Online Sandbox</h3>
+      <p class="text-sm mt-2">No files to set up. Open one of these, make a new project, and paste the two blocks into the <b class="text-ink">HTML</b> and <b class="text-ink">JavaScript</b> panels:</p>
+      <div class="flex flex-wrap gap-2 mt-2">
+        <a class="btn btn-o" href="https://codepen.io/pen/" target="_blank" rel="noopener">CodePen ↗</a>
+        <a class="btn btn-o" href="https://jsfiddle.net/" target="_blank" rel="noopener">JSFiddle ↗</a>
+        <a class="btn btn-o" href="https://stackblitz.com/" target="_blank" rel="noopener">StackBlitz ↗</a>
+      </div>
+      <div class="flex justify-between items-center mt-3"><span class="text-xs font-mono text-vi">1. HTML panel (index.html in StackBlitz)</span><button class="btn btn-o !py-1" onclick="copyCode('cc2',this)">Copy</button></div>
+      <pre id="cc2" class="mt-1 bg-bg border border-line rounded-lg p-3 text-xs text-ink font-mono overflow-x-auto">&lt;button id="play"&gt;&#9654; Play 440 Hz&lt;/button&gt;</pre>
+      <div class="flex justify-between items-center mt-3"><span class="text-xs font-mono text-vi">2. JavaScript panel (index.js in StackBlitz)</span><button class="btn btn-o !py-1" onclick="copyCode('cc3',this)">Copy</button></div>
+      <pre id="cc3" class="mt-1 bg-bg border border-line rounded-lg p-3 text-xs text-ink font-mono overflow-x-auto">document.getElementById('play').onclick = () => {
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 440;
+  gain.gain.value = 0.2;
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 2);
+};</pre>
+      <p class="text-xs mt-2">Click the Play button in the preview pane. The click counts as the user gesture browsers need before they allow sound.</p>
+    </div>
+    <div class="bg-card border border-vi/40 rounded-xl p-4 min-w-0">
+      <h3 class="text-ink font-semibold">⬇️ Tweak Guide</h3>
+      <p class="text-sm mt-1">Find these three values in the JavaScript block, change them, then run it again.</p>
+      <div class="mt-3 space-y-3">
+        <div class="bg-bg border border-line rounded-lg p-3 text-sm"><div class="flex items-center gap-2"><code class="font-mono text-cy text-base">440</code><span class="text-vi">➔</span><b class="text-ink">Pitch</b></div><p class="mt-1">Change this number to alter the pitch. Try <b class="text-cy">261.63</b> for C4, or <b class="text-cy">880</b> for a higher A note.</p></div>
+        <div class="bg-bg border border-line rounded-lg p-3 text-sm"><div class="flex items-center gap-2"><code class="font-mono text-cy text-base">0.2</code><span class="text-vi">➔</span><b class="text-ink">Volume</b></div><p class="mt-1">Change this number (between <b class="text-cy">0.0</b> and <b class="text-cy">1.0</b>) to lower or raise the volume. Start around 0.1 to 0.3 and increase slowly, because 1.0 is full volume and can be very loud.</p></div>
+        <div class="bg-bg border border-line rounded-lg p-3 text-sm"><div class="flex items-center gap-2"><code class="font-mono text-cy text-base">'sine'</code><span class="text-vi">➔</span><b class="text-ink">Wave shape (timbre)</b></div><p class="mt-1">Change this word to <code class="font-mono text-cy">'square'</code> (8-bit game sound), <code class="font-mono text-cy">'sawtooth'</code> (buzzy brass) or <code class="font-mono text-cy">'triangle'</code> (soft and muffled) to completely change the sound.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PATHS -->
+<section id="paths" class="max-w-6xl mx-auto px-4 py-12">
+  <div class="flex flex-wrap items-end justify-between gap-3 mb-2">
+    <h2 class="text-2xl sm:text-3xl font-bold text-ink">Learning Paths</h2>
+    <div class="text-sm"><span id="prog" class="text-cy font-mono">0/10</span> completed <button id="clr" class="ml-3 underline hover:text-ink">reset progress</button></div>
+  </div>
+  <div class="h-2 bg-card rounded-full overflow-hidden mb-6"><div id="bar" class="h-full bg-cy transition-all" style="width:0"></div></div>
+  <div id="tracks" class="grid md:grid-cols-3 gap-4"></div>
+</section>
+
+<!-- LAB -->
+<section id="lab" class="max-w-6xl mx-auto px-4 py-12">
+  <h2 class="text-2xl sm:text-3xl font-bold text-ink">Live Audio Lab</h2>
+  <p class="mt-2 mb-6">Three hands-on experiments. Drag, listen, and watch the physics happen.</p>
+  <div class="space-y-4">
+  <div class="bg-card border border-line rounded-xl p-4">
+    <h3 class="text-ink font-semibold">🎧 1. Active Noise Cancellation (ANC) Simulator</h3>
+    <p class="text-sm mt-1">Drag the slider to 180° and watch the anti-noise wave erase the noise.</p>
+    <div class="grid md:grid-cols-2 gap-3 mt-3">
+      <div><p class="text-xs mb-1"><span class="text-cy">■</span> Noise &nbsp;<span class="text-vi">■</span> Anti-noise (overlaid)</p><canvas id="l1a" width="500" height="160" class="w-full bg-bg border border-line rounded-lg" role="img" aria-label="Noise and anti-noise waves overlaid"></canvas></div>
+      <div><p class="text-xs mb-1"><span class="text-ink">■</span> Result: noise + anti-noise</p><canvas id="l1b" width="500" height="160" class="w-full bg-bg border border-line rounded-lg" role="img" aria-label="Combined wave"></canvas></div>
+    </div>
+    <label for="lSl" class="text-sm block mt-3">Phase shift: <b id="lPh" class="text-cy font-mono">0°</b></label>
+    <input id="lSl" type="range" min="0" max="180" value="0">
+    <p class="mt-1 text-sm">What you would hear: <b id="lRes" class="text-ink"></b></p>
+  </div>
+  <div class="bg-card border border-line rounded-xl p-4">
+    <h3 class="text-ink font-semibold">👂 2. Frequency &amp; Hearing Range Test</h3>
+    <p class="text-sm mt-1">Drag the slider and listen. Start with your volume low!</p>
+    <div class="flex flex-wrap items-center gap-3 mt-3"><span id="hHz" class="text-cy font-mono text-2xl w-32">440 Hz</span><button id="hBtn" class="btn btn-p" aria-pressed="false">▶ Play Tone</button><span id="hNote" class="text-sm"></span></div>
+    <label for="hSl" class="sr-only">Frequency</label><input id="hSl" type="range" min="0" max="1000" value="448" class="mt-3">
+    <div class="relative mt-4 mx-4" id="hBars"></div>
+    <div class="relative h-5 mx-4 text-[10px]" id="hTicks"></div>
+    <p class="text-xs mt-3">⚠️ Hearing safety: keep listening under 85 dB. A handy rule is 60/60: at most 60% volume for at most 60 minutes. Tones above 20 kHz are inaudible to most adults.</p>
+  </div>
+  <div class="bg-card border border-line rounded-xl p-4">
+    <h3 class="text-ink font-semibold">🌧️ 3. Custom Focus Sound Generator</h3>
+    <div class="flex flex-wrap gap-2 mt-3" id="lnB"><button class="btn btn-o" data-n="white" aria-pressed="false">White</button><button class="btn btn-o" data-n="pink" aria-pressed="false">Pink</button><button class="btn btn-o" data-n="brown" aria-pressed="false">Brown</button></div>
+    <canvas id="l3c" width="900" height="200" class="w-full mt-3 bg-bg border border-line rounded-lg" role="img" aria-label="Live spectrum of the noise"></canvas>
+    <p class="text-xs mt-2">Left = low pitches, right = high pitches. <b>White</b>: equal random energy at every pitch (bright hiss). <b>Pink</b>: gently fading highs (like rain). <b>Brown</b>: the highs drop away for a deep, soft rumble that is easy on the ears.</p>
+  </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools" class="max-w-6xl mx-auto px-4 py-12">
+  <h2 class="text-2xl sm:text-3xl font-bold text-ink mb-6">Quick Audio Reference Tools</h2>
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="bg-card border border-line rounded-xl p-4">
+      <h3 class="text-ink font-semibold">Tone &amp; Frequency Generator</h3>
+      <p class="text-sm mt-1">20 Hz to 20,000 Hz (log scale). Lower your volume first.</p>
+      <div id="tHz" class="text-cy font-mono text-2xl my-3">440 Hz</div>
+      <label for="tSl" class="sr-only">Frequency</label>
+      <input id="tSl" type="range" min="0" max="1000" value="434">
+      <button id="tBtn" class="btn btn-p mt-4" aria-pressed="false">▶ Play Tone</button>
+    </div>
+    <div class="bg-card border border-line rounded-xl p-4">
+      <h3 class="text-ink font-semibold">Focus Noise Generator</h3>
+      <p class="text-sm mt-1">Mask distractions for study and deep work.</p>
+      <div class="flex flex-wrap gap-2 mt-4" id="nBtns">
+        <button class="btn btn-o" data-n="white" aria-pressed="false">White</button>
+        <button class="btn btn-o" data-n="pink" aria-pressed="false">Pink</button>
+        <button class="btn btn-o" data-n="brown" aria-pressed="false">Brown</button>
+      </div>
+      <p id="nInfo" class="text-xs mt-4">White: equal energy per Hz (bright hiss). Pink: equal energy per octave. Brown: deep rumble.</p>
+    </div>
+    <div class="bg-card border border-line rounded-xl p-4">
+      <h3 class="text-ink font-semibold">Phase Inversion (ANC) Demo</h3>
+      <canvas id="pc" width="360" height="180" class="w-full bg-bg border border-line rounded-lg mt-3" role="img" aria-label="Two waves and their sum"></canvas>
+      <label for="pSl" class="text-xs block mt-3">Phase shift: <span id="pV" class="text-cy font-mono">180°</span></label>
+      <input id="pSl" type="range" min="0" max="180" value="180">
+      <p class="text-xs mt-2"><span class="text-cy">■</span> noise &nbsp;<span class="text-vi">■</span> anti-noise &nbsp;<span class="text-ink">■</span> result: <span id="pR" class="font-mono text-ink">0%</span></p>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="max-w-3xl mx-auto px-4 py-12 text-center">
+  <h2 class="text-2xl sm:text-3xl font-bold text-ink">About</h2>
+  <p class="mt-3">The Sound of Computers demystifies the physics, computer science, and engineering behind everyday sound through creative coding, interactive audio tools, and gamified learning. Everything runs in your browser with the native Web Audio API. No installs, no tracking.</p>
+</section>
+</main>
+
+<footer class="border-t border-line mt-8">
+  <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex flex-wrap gap-4 justify-between">
+    <div><p>© 2026 The Sound of Computers — Open Source STEM &amp; CS Initiative</p><p class="text-xs mt-1">A non-profit organization created by Yunoo Sung.</p></div>
+    <div class="flex gap-4">
+      <a class="hover:text-ink" href="https://github.com/your-org/the-sound-of-computers">GitHub (placeholder)</a>
+      <a class="hover:text-ink" href="https://developer.mozilla.org/docs/Web/API/Web_Audio_API">MDN Web Audio</a>
+      <a class="hover:text-ink" href="https://web.dev/audio">web.dev Audio</a>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div id="modal" class="hidden fixed inset-0 z-40 bg-black/70 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="mT">
+  <div class="bg-card border border-line rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5">
+    <div class="flex justify-between items-start gap-3">
+      <h3 id="mT" class="text-ink text-xl font-bold"></h3>
+      <button id="mX" class="text-mut hover:text-ink text-xl" aria-label="Close">✕</button>
+    </div>
+    <div id="mL"></div>
+    <button id="mS" class="btn btn-p mt-5">🧪 Take the Mini-Quiz</button>
+    <div id="quizBox" class="hidden mt-5 border-t border-line pt-4"><p class="text-xs text-vi font-mono">🧪 INTERACTIVE CHECKPOINT</p>
+    <div id="mQ" class="mt-4 space-y-4"></div>
+    <p id="mF" class="mt-3 text-sm font-semibold" aria-live="polite"></p>
+    <button id="mC" class="btn btn-p mt-4">Check Answers</button></div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+
+/* ---------- Playground ---------- */
+const SN=[
+`// Hello World: a 440Hz sine wave (concert A)
+const osc = ctx.createOscillator();
+const gain = ctx.createGain();
+osc.type = 'sine';
+osc.frequency.value = 440;
+gain.gain.value = 0.2;
+osc.connect(gain).connect(out);
+osc.start();
+setInfo(440, 'sine', 0.2);`,
+`// Cycle through the four classic wave shapes
+const types = ['sine','square','sawtooth','triangle'];
+const osc = ctx.createOscillator();
+const gain = ctx.createGain();
+gain.gain.value = 0.15;
+osc.frequency.value = 220;
+osc.connect(gain).connect(out);
+let i = 0;
+function next() {
+  osc.type = types[i % 4];
+  setInfo(220, osc.type, 0.15);
+  i++;
+}
+next();
+osc.start();
+const id = setInterval(next, 1200);
+onStop(() => clearInterval(id));`,
+`// Focus white noise: random samples in a looping buffer
+const len = ctx.sampleRate * 2;
+const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+const d = buf.getChannelData(0);
+for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+const src = ctx.createBufferSource();
+src.buffer = buf;
+src.loop = true;
+const gain = ctx.createGain();
+gain.gain.value = 0.12;
+src.connect(gain).connect(out);
+src.start();
+setInfo('20-20k', 'white noise', 0.12);`];
+const code=$('#code'),cv=$('#viz'),g=cv.getContext('2d');
+let pctx=null,pan=null,stops=[];
+code.value=SN[0];
+$('#tpl').onchange=e=>{code.value=SN[e.target.value];stopPlay()};
+$('#reset').onclick=()=>{code.value=SN[$('#tpl').value]};
+function setInfo(f,w,v){$('#rF').textContent=f+' Hz';$('#rW').textContent=w;$('#rG').textContent=v}
+function stopPlay(){stops.forEach(f=>{try{f()}catch(e){}});stops=[];if(pctx){pctx.close().catch(()=>{});pctx=null;pan=null}
+  $('#rF').textContent='— Hz';$('#rW').textContent='—';$('#rG').textContent='—'}
+$('#stop').onclick=stopPlay;
+$('#run').onclick=()=>{
+  stopPlay();$('#err').textContent='';
+  try{
+    pctx=new (window.AudioContext||window.webkitAudioContext)();
+    pan=pctx.createAnalyser();pan.fftSize=2048;pan.connect(pctx.destination);
+    pctx.resume();
+    new Function('ctx','out','setInfo','onStop',code.value)(pctx,pan,setInfo,f=>stops.push(f));
+  }catch(e){$('#err').textContent='Error: '+e.message;stopPlay()}
+};
+function draw(){
+  const w=cv.width,h=cv.height;g.fillStyle='#0F172A';g.fillRect(0,0,w,h);
+  g.strokeStyle='#1E293B';g.lineWidth=1;g.beginPath();g.moveTo(0,h/2);g.lineTo(w,h/2);g.stroke();
+  g.strokeStyle='#06B6D4';g.lineWidth=2;g.shadowColor='#06B6D4';g.shadowBlur=8;g.beginPath();
+  if(pan){const d=new Uint8Array(pan.fftSize);pan.getByteTimeDomainData(d);
+    const n=1024;for(let i=0;i<n;i++){const x=i/(n-1)*w,y=d[i]/255*h;i?g.lineTo(x,y):g.moveTo(x,y)}}
+  else{g.moveTo(0,h/2);g.lineTo(w,h/2)}
+  g.stroke();g.shadowBlur=0;requestAnimationFrame(draw)}
+draw();
+
+/* ---------- Learning paths ---------- */
+const TR=[
+{n:'A · Code the Sound',s:'CS & Web Audio API',l:[
+ ['Hello World in Sound','Sound is air pressure vibrating, and an OscillatorNode generates a repeating wave at a frequency you choose. Setting frequency.value to 440 produces the note A4.',[['Which node creates a tone?',['OscillatorNode','GainNode','AnalyserNode'],0],['Which frequency is concert A?',['220 Hz','440 Hz','880 Hz'],1]]],
+ ['Wave Shapes & Timbres','Sine, square, sawtooth, and triangle waves share a pitch but differ in harmonics, which is why they sound different. Square waves sound hollow and saws sound buzzy.',[['Which wave is the purest, with no harmonics?',['Square','Sine','Sawtooth'],1],['Timbre is mostly determined by…',['Harmonic content','Room size','Cable length'],0]]],
+ ['Controlling Volume & Gain','A GainNode multiplies the amplitude of the signal passing through it. A value of 1 leaves it unchanged, 0 is silence, and values above 1 can clip.',[['Gain 0 means…',['Full volume','Silence','Double volume'],1],['Which node changes loudness?',['GainNode','BiquadFilterNode','PannerNode'],0]]],
+ ['Audio Sonification','Sonification maps data values to sound properties, such as higher temperature to higher pitch. It lets you hear patterns that are hard to see in a chart.',[['Sonification turns ___ into sound.',['Data','Light','Heat'],0],['Mapping rising numbers to rising pitch is a…',['Data-to-frequency mapping','Noise filter','Phase flip'],0]]]]},
+{n:'B · Audio Gear & Optimization',s:'Hardware & Tech',l:[
+ ['Frequency Spectrum','Human hearing spans roughly 20 Hz to 20 kHz, split into bass, mids, and treble. Bass carries power, mids carry voices, and treble adds sparkle and detail.',[['Where does most speech sit?',['Bass','Mids','Ultra-high treble'],1],['Human hearing range is about…',['20 Hz–20 kHz','1 Hz–100 Hz','5 kHz–50 kHz'],0]]],
+ ['Tuning EQ for Gaming & Voice','Boosting 2–4 kHz makes footsteps and voices easier to pick out, while cutting muddy 200–400 Hz clears clutter. Small EQ moves of a few dB are usually enough.',[['Which region helps voice clarity?',['2–4 kHz','20–40 Hz','15–20 kHz'],0],['Muddiness is usually around…',['200–400 Hz','10 kHz','18 kHz'],0]]],
+ ['Mic Noise Suppression & Gain','Set mic gain so your voice peaks well below clipping, then use suppression to remove steady noise like fans. Too much gain amplifies the noise floor along with your voice.',[['Too much mic gain causes…',['Clipping and noise','Better clarity','Lower latency'],0],['Noise suppression best removes…',['Steady background hum','Your voice','Bass notes'],0]]]]},
+{n:'C · Focus & Wave Physics',s:'Acoustics & Health',l:[
+ ['Decibel Safety & Hearing','The decibel scale is logarithmic, so +10 dB is roughly twice as loud. Long exposure above about 85 dB can permanently damage hearing.',[['Safe-exposure threshold is about…',['85 dB','30 dB','120 dB'],0],['The decibel scale is…',['Logarithmic','Linear','Random'],0]]],
+ ['Active Noise Cancellation','ANC microphones sample ambient sound and the headphones play an inverted copy, 180° out of phase. The two waves sum to near zero through destructive interference.',[['ANC plays a wave that is…',['180° out of phase','Louder','Higher pitched'],0],['This effect is called…',['Destructive interference','Resonance','Aliasing'],0]]],
+ ['Sound Masking for Study','White noise has equal energy at every frequency, pink falls off 3 dB per octave, and brown falls faster for a deeper rumble. Steady noise can mask sudden sounds that break concentration.',[['Which is the deepest rumble?',['White','Pink','Brown'],2],['Masking noise helps by…',['Covering sudden sounds','Raising pitch','Adding echo'],0]]]]}];
+/* LS[track][node] = [paragraphs, key concept, code/diagram, caption] */
+const LS=[[
+[["Sound is just air pressure going up and down, over and over. The number of back-and-forth cycles per second is the <b>frequency</b>, measured in hertz (Hz). Your speaker cone pushes the air that many times every second.","In the browser, an <b>OscillatorNode</b> is a tiny wave factory. You create it, set its frequency, connect it to the speakers (<code>ctx.destination</code>), and call <code>start()</code>. Browsers require a click first, so audio only begins after a user gesture."],"Frequency = cycles per second. Higher Hz means higher pitch. 440 Hz is the note A4, the orchestral tuning standard.",`const ctx = new AudioContext();
+const osc = ctx.createOscillator(); // wave factory
+osc.frequency.value = 440;          // Hz
+osc.connect(ctx.destination);       // to speakers
+osc.start();
+osc.stop(ctx.currentTime + 1);      // stop after 1s`,"Code example: play A4 for one second"],
+[["A wave's <b>shape</b> decides its timbre, the character that makes a flute sound different from a trumpet playing the same note. Shape changes which extra frequencies, called <b>harmonics</b>, ride along with the main pitch.","A sine wave is pure: one frequency only. Square and sawtooth waves are packed with harmonics, so they sound hollow or buzzy. Triangle sits in between, soft and mellow. Synthesizers mix and filter these shapes to build almost any instrument."],"Same pitch + different wave shape = different timbre. Timbre comes from harmonic content.",`Harmonics of a 100 Hz note:
+Sine      100
+Square    100 + 300 + 500 + 700 ...   (odd, 1/n)
+Sawtooth  100 + 200 + 300 + 400 ...   (all, 1/n)
+Triangle  100 + 300 + 500 ...         (odd, 1/n^2, quiet)
+
+osc.type = 'sine' | 'square' | 'sawtooth' | 'triangle';`,"Diagram: harmonic recipes and the code to switch them"],
+[["Loudness in code is <b>amplitude</b>, the height of the wave. A <b>GainNode</b> sits between a source and the speakers and multiplies every sample by a number you choose.","A gain of 1 leaves sound unchanged, 0.5 halves the amplitude, and 0 is silence. Go above 1 and the signal can exceed what speakers can handle, causing harsh <b>clipping</b>. To avoid clicks, change gain smoothly with a ramp instead of jumping."],"Output = input x gain. Keep gain at or below 1 to avoid clipping, and ramp changes to avoid clicks.",`const gain = ctx.createGain();
+gain.gain.value = 0.3;                 // 30% volume
+osc.connect(gain).connect(ctx.destination);
+
+// fade out over 2 seconds
+gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2);`,"Code example: volume control and a fade-out"],
+[["Sonification means turning data into sound. Instead of reading a chart, you hear it: a rising stock price becomes a climbing pitch, and a spike in a heartbeat becomes a sudden high note.","The trick is a <b>mapping function</b> that rescales your data range onto a frequency range. Our ears judge pitch by ratios, so for music-like results many designers map to semitones, but a simple linear map is a great start."],"Sonification = map(data range to pitch range). Pick a comfortable range such as 200-800 Hz so changes are easy to hear.",`const data = [3, 7, 4, 9, 12, 8];
+const min = 3, max = 12;
+data.forEach((v, i) => {
+  const hz = 200 + ((v - min) / (max - min)) * 600;
+  const o = ctx.createOscillator();
+  o.frequency.value = hz;
+  o.connect(ctx.destination);
+  o.start(ctx.currentTime + i * 0.4);
+  o.stop(ctx.currentTime + i * 0.4 + 0.3);
+});`,"Code example: data array to a melody of pitches"]
+],[
+[["Human ears detect roughly 20 Hz to 20,000 Hz. Audio engineers split that range into three broad zones so they can talk about sound clearly: bass, mids, and treble.","Bass gives weight, like kick drums and explosions. Mids carry voices and most instruments, so they decide how clear things sound. Treble adds air and sparkle, like cymbals and the hiss in the letter S. High-frequency hearing fades naturally with age."],"Bass = power. Mids = clarity and voices. Treble = detail and sparkle. Each zone shapes how audio feels.",`20 Hz        250 Hz        4 kHz         20 kHz
+|--- BASS ---|---- MIDS ----|--- TREBLE ---|
+ rumble        voices         cymbals, air
+ kick drum     guitars        "S" sounds
+ explosions    snare body     fine detail`,"Diagram: the frequency spectrum"],
+[["An <b>equalizer</b> (EQ) boosts or cuts chosen frequency bands, measured in decibels (dB). In games you want to hear footsteps and reloads clearly. For voice, you want words to be crisp instead of muddy.","Cutting around 200-400 Hz removes boxy mud that hides detail. Boosting 2-4 kHz brings out consonants and footsteps, because our ears are most sensitive there. Keep moves small: 2 to 4 dB is plenty, and cuts usually sound cleaner than big boosts."],"Cut mud (200-400 Hz) and gently boost presence (2-4 kHz). Small moves, big results.",`const eq = ctx.createBiquadFilter();
+eq.type = 'peaking';
+eq.frequency.value = 3000; // center at 3 kHz
+eq.Q.value = 1;            // width of the boost
+eq.gain.value = 3;         // +3 dB
+source.connect(eq).connect(ctx.destination);`,"Code example: a +3 dB presence boost"],
+[["A microphone converts sound into a tiny voltage, and <b>gain</b> amplifies it. Too low and your voice is buried under hiss. Too high and loud moments hit the ceiling and distort, which is called clipping.","A good rule is to speak normally and aim for peaks around -12 to -6 dB on the meter. Noise suppression then removes steady sounds like fans, but heavy settings can make your voice sound watery. Fixing the room beats fixing it in software."],"Set gain so peaks stay below clipping, then add suppression. Treat software as a backup, not a cure.",`navigator.mediaDevices.getUserMedia({ audio: {
+  noiseSuppression: true,
+  echoCancellation: true,
+  autoGainControl: false   // set gain yourself
+}});
+
+Meter:  -60 ... -18 ... [-12 to -6 TARGET] ... 0 dB = CLIP`,"Code + meter: capture settings and target level"]
+],[
+[["Decibels (dB) measure sound level on a logarithmic scale, because our ears handle a gigantic range of intensities. Every +10 dB sounds roughly twice as loud, even though it is ten times more sound energy.","Hearing damage depends on both level and time. At 85 dB, about 8 hours is the recommended limit, and every +3 dB cuts safe time in half. Hair cells in the inner ear do not grow back, so protecting them now matters."],"+10 dB sounds about twice as loud. Around 85 dB limit exposure to ~8 hours; every +3 dB halves the safe time.",` 30 dB  whisper
+ 60 dB  conversation
+ 85 dB  city traffic       -> 8 hours
+ 91 dB  blender            -> 2 hours
+100 dB  loud headphones    -> 15 minutes
+120 dB  rock concert       -> risk within minutes`,"Chart: decibel levels and safe listening time"],
+[["Sound waves can add together. When two identical waves line up, they get louder. When one is flipped upside down, <b>180 degrees out of phase</b>, peaks meet valleys and they cancel. This is called <b>destructive interference</b>.","Noise-canceling headphones use tiny microphones to listen to the outside world, then play an inverted copy through the speakers. It works best on steady low sounds like engine hum, because the electronics have time to react."],"Noise + inverted noise = silence. ANC multiplies the signal by -1, a 180 degree phase flip.",`noise:      /\    /\    /\
+anti-noise:   \/    \/    \/
+result:     --------------   (flat = silence)
+
+const invert = ctx.createGain();
+invert.gain.value = -1;   // phase inversion`,"Diagram + code: phase inversion"],
+[["A silent room is not always best for focus, because sudden sounds like a door slam or a notification stand out sharply. Steady background noise <b>masks</b> them, so interruptions are less noticeable.","Noise colors differ by how energy spreads across frequencies. White noise is bright like a hiss. Pink noise drops 3 dB per octave and sounds like steady rain. Brown noise drops 6 dB per octave for a deep rumble. Keep the volume low and try each."],"Masking hides sudden sounds behind steady ones. White = bright, Pink = balanced, Brown = deep.",`// white: equal energy at every frequency
+d[i] = Math.random() * 2 - 1;
+
+// brown: a random walk, each sample drifts from the last
+last = (last + 0.02 * white) / 1.02;
+d[i] = last * 3.5;`,"Code example: generating white and brown noise"]
+]];
+/* LS2[track][node] = [2 bullets, annotated code steps, fun fact, definitions, quick hint] */
+const LS2=[[
+[[`Sound is air wiggling back and forth. How many wiggles per second is the <b>frequency</b>, in Hz.`,`Code makes a wave generator, sets its pitch, then plugs it into your speakers.`],[[`const audioCtx = new AudioContext();`,`🔌 1. Turn on the computer's digital audio engine.`],[`const osc = audioCtx.createOscillator();`,`🔊 2. Create a wave generator (makes raw vibration).`],[`osc.type = 'sine';`,`🌊 Setting the wave shape.`],[`osc.frequency.value = 440;`,`🎵 3. Set the pitch to 440 Hz (Concert A note).`],[`osc.connect(audioCtx.destination);`,`🎧 4. Plug the wave generator into your headphones/speakers.`],[`osc.start();`,`▶️ 5. Press play!`]],`Whales communicate at 10-40 Hz, lower than the lowest key on a piano (27.5 Hz)!`,[[`Oscillator`,`A digital wave generator`],[`Frequency`,`How many wiggles per second`],[`Hz`,`Hertz: one cycle per second`]],`The OscillatorNode makes the tone. 440 Hz is Concert A.`],
+[[`The shape of a wave changes its <b>timbre</b>: the color or personality of a sound.`,`Sine is smooth and pure, square is hollow, sawtooth is buzzy, triangle is soft.`],[[`osc.type = 'sine';`,`🌊 Pick the smooth, pure wave.`],[`osc.type = 'sawtooth';`,`🪚 Or switch to a buzzy wave full of extra harmonics.`],[`osc.frequency.value = 220;`,`🎵 The pitch stays the same. Only the color changes!`]],`A violin and a flute can play the same note, but you can tell them apart because of timbre.`,[[`Timbre`,`The color or character of a sound`],[`Harmonic`,`An extra, higher pitch layered on the main note`]],`Sine is the purest: no extra harmonics. Timbre comes from harmonics.`],
+[[`Volume is the height of the wave, called <b>amplitude</b>.`,`A GainNode is a volume knob: 1 is normal, 0 is silent.`],[[`const gain = audioCtx.createGain();`,`🎚️ Create a volume knob.`],[`gain.gain.value = 0.3;`,`🔈 Turn it to 30%. (0 would be silence.)`],[`osc.connect(gain);`,`🔗 The wave generator feeds the knob.`],[`gain.connect(audioCtx.destination);`,`🎧 The knob feeds your speakers.`]],`In code, turning the volume down is just multiplying every sample by a number below 1.`,[[`Amplitude`,`Wave height, which we hear as loudness`],[`Gain`,`A volume multiplier`],[`Clipping`,`Harsh distortion when a signal is too big`]],`GainNode changes loudness. Gain 0 means silence.`],
+[[`Sonification turns numbers into sound so you can <i>hear</i> data.`,`A simple rule maps bigger numbers to higher pitches.`],[[`const hz = 200 + (v - min) / (max - min) * 600;`,`📐 Squeeze any number into a 200-800 Hz pitch range.`],[`osc.frequency.value = hz;`,`🎵 Use that pitch for this data point.`],[`osc.start(audioCtx.currentTime + i * 0.4);`,`⏱️ Play each data point 0.4 seconds after the last.`]],`NASA turns telescope data into sound so blind and low-vision people can explore space images.`,[[`Sonification`,`Turning data into sound`],[`Mapping`,`A rule that converts one range into another`]],`Sonification turns data into sound. Rising numbers become rising pitch.`]
+],[
+[[`Humans hear about 20 Hz to 20,000 Hz, split into <b>bass</b>, <b>mids</b> and <b>treble</b>.`,`Bass is rumble, mids are voices, treble is sparkle.`],[[`const analyser = audioCtx.createAnalyser();`,`🔬 Create a tool that measures which pitches are present.`],[`source.connect(analyser);`,`🔗 Feed the sound into it.`],[`analyser.getByteFrequencyData(data);`,`📊 Fill a list: how loud is each pitch?`]],`Dogs can hear up to about 45,000 Hz, far above our 20,000 Hz limit.`,[[`Bass`,`Low, deep pitches`],[`Mids`,`Middle pitches, where voices live`],[`Treble`,`High, bright pitches`]],`Speech lives in the mids. Human hearing spans 20 Hz to 20 kHz.`],
+[[`An <b>equalizer</b> turns chosen pitch ranges up or down.`,`Cut muddy 200-400 Hz. Boost 2-4 kHz for clear voices and footsteps.`],[[`const eq = audioCtx.createBiquadFilter();`,`🎛️ Create one EQ band.`],[`eq.type = 'peaking';`,`⛰️ Make it a bump (a boost) at one spot.`],[`eq.frequency.value = 3000;`,`📍 Aim at 3 kHz, where voices sound clear.`],[`eq.gain.value = 3;`,`➕ Boost by 3 dB, a gentle lift.`]],`Our ears are most sensitive around 2-5 kHz, close to where a baby's cry sits.`,[[`EQ`,`Tone controls for specific pitch ranges`],[`dB`,`Decibel: a unit for changes in loudness`]],`Voice clarity is 2-4 kHz. Mud is 200-400 Hz.`],
+[[`Mic gain boosts your voice, but too much also boosts noise and causes clipping.`,`Aim for peaks around -12 to -6 dB, then turn on noise suppression.`],[[`navigator.mediaDevices.getUserMedia({ audio: {`,`🎤 Ask permission to use the microphone.`],[`  noiseSuppression: true,`,`🤫 Ask the browser to remove steady hum like fans.`],[`  autoGainControl: false`,`🎚️ Keep the volume stable by hand instead.`],[`}});`,`✅ Done: you get a live mic stream.`]],`Noise suppression uses trained AI models to tell voices apart from fans.`,[[`Gain`,`How much the mic signal is amplified`],[`Clipping`,`Distortion from a signal that is too loud`],[`Noise floor`,`Constant quiet background hiss`]],`Too much gain causes clipping and more noise. Suppression removes steady hum.`]
+],[
+[[`Decibels (dB) measure loudness. +10 dB sounds about twice as loud.`,`Above 85 dB, limit your time. Every +3 dB cuts safe time in half.`],[[`const gain = audioCtx.createGain();`,`🎚️ A safety valve for volume.`],[`gain.gain.value = 0.2;`,`🔉 Keep it moderate (20%).`],[`// 85 dB = 8 hours, 100 dB = 15 minutes`,`⏳ Louder sound means a shorter safe time.`]],`A normal conversation is about 60 dB, but a rock concert can reach 110-120 dB.`,[[`Decibel`,`A unit that measures loudness`],[`Hair cells`,`Tiny sensors in your inner ear that do not grow back`]],`85 dB is the safe-listening line. The dB scale is logarithmic.`],
+[[`Two waves that are exact opposites cancel each other: <b>destructive interference</b>.`,`Noise-canceling headphones record noise and play the opposite.`],[[`const invert = audioCtx.createGain();`,`🔁 Create a flipper.`],[`invert.gain.value = -1;`,`🙃 Multiply by -1 to turn the wave upside down.`],[`noise.connect(invert);`,`🔗 Send the noise through the flipper.`],[`invert.connect(audioCtx.destination);`,`🎧 Play the anti-noise. Both waves cancel!`]],`Noise cancellation was first developed for pilots, because engine noise made radio hard to hear.`,[[`Phase`,`Where a wave is in its up-and-down cycle`],[`Interference`,`Waves adding together or cancelling out`]],`180° out of phase means cancellation. That is destructive interference.`],
+[[`Steady noise hides sudden sounds, so distractions stand out less.`,`White is a bright hiss, pink is like rain, brown is a deep rumble.`],[[`buffer[i] = Math.random() * 2 - 1;`,`🎲 White noise: a random value every sample.`],[`last = (last + 0.02 * white) / 1.02;`,`🚶 Brown noise: tiny steps from the last value.`],[`src.loop = true;`,`🔁 Repeat forever.`],[`src.start();`,`▶️ Press play.`]],`Brown noise is named after Robert Brown and his random-motion discovery, not the color.`,[[`Masking`,`Covering up sudden sounds with steady ones`],[`White noise`,`Equal energy at every pitch`],[`Brown noise`,`Mostly low pitches, a deep rumble`]],`Brown is the deepest. Masking covers sudden sounds.`]
+]];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function renderLesson(a,i,S){
+ const Z=LS2[a][i];
+ $('#mL').innerHTML=`<div class="grid md:grid-cols-5 gap-4 mt-3">
+ <aside class="md:col-span-2 space-y-3 text-sm" aria-label="Help and context">
+  <div class="bg-vi/10 border border-vi/40 rounded-lg p-3"><p class="text-xs font-bold text-vi">💡 FUN FACT</p><p class="mt-1 text-ink">${Z[2]}</p></div>
+  <div class="bg-bg border border-line rounded-lg p-3"><p class="text-xs font-bold text-cy">🔑 KEY DEFINITIONS</p><dl class="mt-1 space-y-1">${Z[3].map(d=>`<div><dt class="inline text-ink font-semibold">${d[0]}</dt> = <dd class="inline">${d[1]}</dd></div>`).join('')}</dl></div>
+  <div class="bg-amber-400/10 border border-amber-400/40 rounded-lg p-3"><p class="text-xs font-bold text-amber-400">🔍 QUICK HINT</p><p class="mt-1 text-ink">${Z[4]}</p></div></aside>
+ <section class="md:col-span-3 min-w-0"><p class="text-xs text-vi font-mono">📚 LESSON · ${TR[a].s}</p>
+  <ul class="mt-2 space-y-2 list-disc pl-5 text-ink">${Z[0].map(b=>`<li>${b}</li>`).join('')}</ul>
+  <div class="mt-3 border-l-4 border-cy bg-cy/10 rounded-r-lg p-3"><p class="text-xs text-cy font-bold">💡 KEY CONCEPT</p><p class="text-ink text-sm mt-1">${S[1]}</p></div>
+  <p class="mt-4 text-xs font-bold text-ink">🔬 VISUAL CODE BREAKDOWN</p>
+  <ol class="mt-1 bg-bg border border-line rounded-lg p-3 space-y-3 overflow-x-auto">${Z[1].map(s=>`<li><code class="font-mono text-xs text-ink whitespace-pre">${esc(s[0])}</code><div class="ml-3 mt-1 pl-3 border-l-2 border-b-2 border-cy rounded-bl-lg text-sm text-cy">${esc(s[1])}</div></li>`).join('')}</ol></section></div>`;
+}
+/* LS3[track][node] = [circuit chain, circuit explanation, WHY per code line, experiments] */
+const LS3=[[
+[`[ Generator Node ] ➔ [ Volume / Filter Node ] ➔ [ Speakers / Headphones ]`,`Without connecting these nodes in sequence, the computer generates data in memory, but no signal ever reaches your ears. (Our first example plugs the generator straight into the speakers. Later lessons add a volume or filter node in the middle.)`,[`Browsers block sound from playing automatically. Calling <code>new AudioContext()</code> initializes the browser's hardware audio driver and requests permission to output sound.`,`<code>.createOscillator()</code> is a built-in Web Audio method that calculates mathematical wave values (like a sine wave) hundreds of thousands of times per second.`,`Changing <code>.type</code> alters the mathematical formula used to calculate the wave. 'sine' uses smooth math (y = sin(x)) for a clean tone; 'square' clips the wave to create a harsh 8-bit game sound.`,`<code>.frequency</code> is an AudioParam object inside the oscillator. We must access its <code>.value</code> property to tell the digital clock how many times per second (Hertz) the wave cycle should repeat. 440 Hz vibrates the speaker 440 times every second.`,`<code>audioCtx.destination</code> represents your computer's actual sound card/audio output. <code>.connect()</code> acts as a digital virtual audio cable bridging the oscillator to your speakers.`,`Creating a node only builds the circuit in memory. <code>.start()</code> tells the browser clock to begin processing the mathematical calculations in real time.`],[`If you delete <code>osc.connect(...)</code>: The code runs without errors, but stays silent because the audio pipeline isn't plugged into the destination.`,`If you change 440 to 880: The speaker moves twice as fast, doubling the pitch to produce an octave higher (Concert A5).`]],
+[`[ Oscillator: choose the shape ] ➔ [ Speakers ]`,`The wave shape is chosen inside the generator, before the signal travels down the chain. Change the shape and everything downstream changes, with no extra wiring.`,[`<code>.type</code> is a property on the oscillator, so we set it directly. 'sine' is the pure formula y = sin(x) with no extra harmonics, the cleanest possible tone.`,`Same property, different string. The browser only accepts 'sine', 'square', 'sawtooth' or 'triangle', and each swaps in a new math formula. Sawtooth ramps up then drops, which adds many harmonics (buzz).`,`Shape and pitch are separate settings. Holding 220 Hz fixed while changing <code>.type</code> proves that timbre, not pitch, makes sounds different.`],[`If you type 'squar' by mistake: the browser ignores the unknown shape, so the old shape keeps playing.`,`If you change 220 to 440 but keep 'sawtooth': the buzz stays the same, but the note jumps an octave higher.`]],
+[`[ Oscillator ] ➔ [ GainNode (volume) ] ➔ [ Speakers ]`,`The gain node sits in the middle of the chain. Everything must flow through it, so it can scale the signal before it reaches your ears.`,[`<code>.createGain()</code> builds a volume node. It is separate from the oscillator because one volume knob can control many sound sources.`,`The first <code>.gain</code> is the node; the second is its AudioParam (the adjustable setting). <code>.value = 0.3</code> multiplies every sample by 0.3, which is 30% volume.`,`The oscillator no longer plugs into the speakers. It plugs into the gain node, so the volume is applied first.`,`The gain node now needs its own output cable to the sound card. Skipping this leaves the chain unfinished.`],[`If you skip <code>gain.connect(...)</code>: the oscillator feeds the gain node, but nothing reaches the speakers. Silence.`,`If you set <code>gain.gain.value = 3</code>: the wave is 3 times taller than speakers can handle, so it clips and sounds harsh. Keep it at 1 or below.`]],
+[`[ Data ➔ Math Mapping ] ➔ [ Oscillator pitch ] ➔ [ Speakers ]`,`Here the generator's pitch is driven by your data. The math converts each number into a frequency before the signal flows down the chain.`,[`<code>(v - min) / (max - min)</code> scales any value to 0-1. Multiplying by 600 and adding 200 stretches that to 200-800 Hz, a range ears hear easily.`,`We reuse the same <code>.frequency.value</code> setting from lesson 1, but feed it the calculated number instead of a fixed 440.`,`<code>currentTime</code> is the audio clock in seconds. Adding <code>i * 0.4</code> schedules each note 0.4 s after the previous one, so the data plays in order like a melody.`],[`If you change 600 to 1200: the pitch range gets wider, so differences in the data sound more dramatic.`,`If you remove <code>i * 0.4</code>: every note starts at the same moment and you hear one big chord instead of a melody.`]]
+],[
+[`[ Any Sound Source ] ➔ [ Analyser Node ] ➔ [ Speakers ]`,`The analyser sits in the chain like a measuring window. Sound passes through it while it reports how loud each pitch is.`,[`<code>.createAnalyser()</code> builds a node that runs a math tool (the FFT) which splits a sound into its separate pitches.`,`The analyser only measures what flows into it, so the sound source must be plugged in first.`,`<code>data</code> is a list of numbers. This method fills it with values 0-255, one per pitch slot, from bass on the left to treble on the right.`],[`If you forget <code>source.connect(analyser)</code>: the data list stays full of zeros because nothing flows in.`,`If you play a bass drum: the numbers on the left side of the list jump up, while the treble slots stay low.`]],
+[`[ Sound Source ] ➔ [ EQ Filter Node ] ➔ [ Speakers ]`,`The EQ is the filter node in the middle. It reshapes the sound's tone before it leaves the chain.`,[`A biquad filter is a tiny, efficient math filter built into the browser. One node type can act as many different filters.`,`'peaking' makes a bump or dip around one pitch. Other strings like 'lowpass' or 'highshelf' do different jobs.`,`<code>.frequency</code> is the center of the bump. 3000 Hz is where speech consonants and footsteps live.`,`On a peaking filter, <code>.gain</code> is in decibels. +3 dB lifts the bump gently; negative values cut instead.`],[`If you change <code>eq.gain.value</code> to -6: that band gets quieter, which cuts mud or harshness.`,`If you set <code>eq.frequency.value = 300</code>: you now change the muddy low mids instead of the clarity zone.`]],
+[`[ Microphone Stream ] ➔ [ Cleanup: Suppression / Gain ] ➔ [ Your App or Speakers ]`,`Mic audio flows in from the outside world. The settings clean it up before the rest of your chain uses it.`,[`Mic access is private, so the browser must ask you. <code>getUserMedia</code> is that request, and the audio object lists what you want. It returns a Promise that resolves to a live stream.`,`This true/false setting turns on the browser's built-in filter that learns steady sounds like fans and subtracts them.`,`Auto gain keeps raising your volume in quiet moments, which also raises noise. Setting <code>false</code> lets you control gain yourself.`,`This closes the settings object and the function call. When permission is granted, you receive the stream and can connect it to the audio chain.`],[`If you set <code>noiseSuppression</code> to false: steady hum from fans stays in your audio.`,`If the user clicks Block on the permission popup: the request fails with an error, so always handle failures.`]]
+],[
+[`[ Sound Source ] ➔ [ Gain (safe volume) ] ➔ [ Your Ears ]`,`Volume is the last thing before your ears, so the gain node is your safety valve.`,[`Gain is the simplest volume control, and it lets you cap the level for the whole chain.`,`0.2 means 20% of full amplitude, which is about -14 dB. Because decibels are logarithmic, small gain numbers still make a big loudness difference.`,`Comments are ignored by the computer. They are notes to humans: the louder the sound, the shorter the safe listening time.`],[`If you raise <code>gain.gain.value</code> from 0.2 to 1: the sound gets about 14 dB louder, so safe listening time shrinks a lot.`,`If you listen at 100 dB instead of 85 dB: safe time drops from 8 hours to about 15 minutes.`]],
+[`[ Noise Source ] ➔ [ Invert: Gain × -1 ] ➔ [ Speakers (meets the real noise) ]`,`The inverter is the middle node. Its flipped copy then meets the real noise in the air, and the two cancel.`,[`We reuse the gain node, because multiplying by a negative number is how you flip a wave.`,`-1 flips every sample: peaks become valleys. This is a 180 degree phase inversion.`,`The inverter only flips what flows into it, so the noise copy has to go in first.`,`The flipped wave must reach the speakers to meet the real noise.`],[`If you change -1 to -0.5: you cancel only half the noise.`,`If you change -1 to 1: you add a normal copy, which makes the noise louder instead.`]],
+[`[ Random Numbers ] ➔ [ Looping Buffer ] ➔ [ Speakers ]`,`Noise is generated from math, stored in a short buffer, then looped so it never ends.`,[`<code>Math.random()</code> gives 0 to 1. Times 2 minus 1 stretches that to -1 to 1, the full range of a wave, so every sample is a random value.`,`Each sample moves a small step from the last one instead of jumping around. Slow wandering is mostly low pitches, which is brown noise. Dividing by 1.02 stops the value drifting away.`,`A buffer is only a couple of seconds long. Setting <code>loop = true</code> repeats it seamlessly so the noise never stops.`,`Like the oscillator, a source node does nothing until <code>.start()</code> runs.`],[`If you remove <code>src.loop = true</code>: the noise plays once and stops when the buffer ends.`,`If you change 0.02 to 0.2 in the brown noise line: it wanders faster, so it sounds brighter, closer to pink noise.`]]
+]];
+function addCircuit(a,i){
+ const Z=LS2[a][i],C=LS3[a][i],ol=$('#mL ol'),h=ol.previousElementSibling;
+ h.textContent='💻 THE ANNOTATED CODE & WHY EACH STRING WORKS';
+ h.insertAdjacentHTML('beforebegin','<p class="mt-5 text-xs font-bold text-vi">HOW IT WORKS &amp; WHY WE WRITE IT THIS WAY</p><div class="mt-1 bg-bg border border-vi/40 rounded-lg p-3 text-sm"><p class="text-xs font-bold text-vi">🔌 THE AUDIO CIRCUIT LOGIC (the Why)</p><p class="mt-1">To make a computer speak, we build a digital chain in code:</p><p class="my-2 font-mono text-xs text-cy overflow-x-auto whitespace-pre">'+esc(C[0])+'</p><p>'+C[1]+'</p></div>');
+ ol.outerHTML='<div class="mt-1 space-y-3">'+Z[1].map((s,k)=>'<div class="bg-bg border border-line rounded-lg p-3 overflow-x-auto"><p class="text-[11px] text-mut">Code String '+(k+1)+'</p><code class="font-mono text-xs text-ink whitespace-pre">'+esc(s[0])+'</code><p class="mt-2 text-sm"><b class="text-cy">WHAT IT IS:</b> '+esc(s[1].replace(/ \d\. /,' '))+'</p><p class="mt-1 text-sm"><b class="text-vi">WHY THIS EXACT STRING:</b> '+C[2][k]+'</p></div>').join('')+'</div><div class="mt-4 bg-amber-400/10 border border-amber-400/40 rounded-lg p-3 text-sm"><p class="text-xs font-bold text-amber-400">🧪 WHAT HAPPENS IF I CHANGE THIS?</p><ul class="mt-1 space-y-1 list-disc pl-5 text-ink">'+C[3].map(x=>'<li>'+x+'</li>').join('')+'</ul></div>';
+}
+const ids=[];TR.forEach((t,a)=>t.l.forEach((_,i)=>ids.push(a+'-'+i)));
+let done={};try{done=JSON.parse(localStorage.getItem('soc-progress')||'{}')}catch(e){}
+function save(){try{localStorage.setItem('soc-progress',JSON.stringify(done))}catch(e){}}
+function renderTracks(){
+  const root=$('#tracks');root.innerHTML='';
+  TR.forEach((t,a)=>{
+    const c=document.createElement('div');c.className='bg-card border border-line rounded-xl p-4';
+    c.innerHTML=`<h3 class="text-ink font-semibold">${t.n}</h3><p class="text-xs text-vi mb-4">${t.s}</p><div class="flex flex-col items-center gap-0"></div>`;
+    const col=c.lastChild;
+    t.l.forEach((L,i)=>{
+      const id=a+'-'+i,ok=done[id],open=i===0||done[a+'-'+(i-1)];
+      const w=document.createElement('div');w.className='flex flex-col items-center text-center';
+      w.innerHTML=(i?`<div class="w-0.5 h-5 ${ok||open?'bg-cy':'bg-line'}"></div>`:'')+
+        `<button class="node ${ok?'done':''}" ${open?'':'disabled'} aria-label="${L[0]}${ok?' (completed)':open?'':' (locked)'}">${ok?'✓':open?(a+1)+'.'+(i+1):'🔒'}</button>
+         <span class="text-xs mt-1 text-ink">${L[0]}</span><span class="text-[11px]">${ok?'Completed ✅':open?'Ready':'Locked'}</span>`;
+      w.querySelector('button').onclick=()=>openNode(a,i);
+      col.appendChild(w)});
+    root.appendChild(c)});
+  const n=ids.filter(i=>done[i]).length;
+  $('#prog').textContent=n+'/'+ids.length;$('#bar').style.width=(n/ids.length*100)+'%';
+}
+let cur=null;
+function openNode(a,i){
+  cur=[a,i];const L=TR[a].l[i];
+  $('#mT').textContent=L[0];$('#mF').textContent='';const S=LS[a][i];
+  $('#mL').innerHTML='<p class="text-xs text-vi font-mono mt-2">📚 LESSON · '+TR[a].s+'</p>'+S[0].map(p=>'<p class="mt-3 leading-relaxed">'+p+'</p>').join('')+'<div class="mt-4 border-l-4 border-cy bg-cy/10 rounded-r-lg p-3"><p class="text-xs text-cy font-bold">💡 KEY CONCEPT</p><p class="text-ink text-sm mt-1">'+S[1]+'</p></div><p class="mt-4 text-xs">'+S[3]+'</p><pre class="mt-1 bg-bg border border-line rounded-lg p-3 text-xs text-ink font-mono overflow-x-auto"></pre>';
+  renderLesson(a,i,S);addCircuit(a,i);$('#mS').classList.remove('hidden');$('#quizBox').classList.add('hidden');
+  $('#mQ').innerHTML=L[2].map((q,k)=>`<fieldset><legend class="text-ink text-sm font-semibold mb-1">${k+1}. ${q[0]}</legend>${q[1].map((o,j)=>`<label class="flex items-center gap-2 py-1 text-sm cursor-pointer"><input type="radio" name="q${k}" value="${j}" class="accent-cyan-500"> ${o}</label>`).join('')}</fieldset>`).join('');
+  $('#mC').textContent='Check Answers';$('#modal').classList.remove('hidden');$('#mS').focus();$('#modal .bg-card').scrollTop=0;
+}
+function closeM(){$('#modal').classList.add('hidden')}
+$('#mX').onclick=closeM;
+$('#mQ').addEventListener('change',e=>{const k=+e.target.name.slice(1),q=TR[cur[0]].l[cur[1]][2][k],f=e.target.closest('fieldset');let m=f.querySelector('.fb');if(!m){m=document.createElement('p');f.appendChild(m)}const ok=+e.target.value===q[2];m.className='fb text-sm mt-1 font-semibold '+(ok?'text-cy':'text-amber-400');m.textContent=ok?'✅ Nice, that is right!':'💡 Not quite. Check the Quick Hint on the left.';f.querySelectorAll('label').forEach(l=>l.classList.remove('bg-cy/20','bg-amber-400/10'));e.target.closest('label').classList.add(ok?'bg-cy/20':'bg-amber-400/10')});
+$('#mS').onclick=()=>{$('#mS').classList.add('hidden');$('#quizBox').classList.remove('hidden');$('#quizBox').scrollIntoView({behavior:'smooth',block:'nearest'})};
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeM()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+$('#mC').onclick=()=>{
+  if(!cur)return;const [a,i]=cur,L=TR[a].l[i];
+  if($('#mC').textContent==='Close'){closeM();return}
+  let right=0;L[2].forEach((q,k)=>{const s=document.querySelector(`input[name=q${k}]:checked`);if(s&&+s.value===q[2])right++});
+  if(right===L[2].length){done[a+'-'+i]=1;save();renderTracks();
+    $('#mF').className='mt-3 text-sm font-semibold text-cy';$('#mF').textContent='Completed ✅ Next level unlocked!';$('#mC').textContent='Close'}
+  else{$('#mF').className='mt-3 text-sm font-semibold text-red-400';$('#mF').textContent=right+'/'+L[2].length+' correct. Re-read the lesson and try again.'}
+};
+$('#clr').onclick=()=>{done={};save();renderTracks()};
+renderTracks();
+
+/* ---------- Quick tools ---------- */
+let tctx=null;
+function ac(){if(!tctx)tctx=new (window.AudioContext||window.webkitAudioContext)();tctx.resume();return tctx}
+// tone
+let tosc=null;
+const hz=v=>Math.round(20*Math.pow(1000,v/1000));
+$('#tSl').oninput=e=>{const f=hz(+e.target.value);$('#tHz').textContent=f+' Hz';if(tosc)tosc.frequency.setTargetAtTime(f,tosc.context.currentTime,.02)};
+$('#tBtn').onclick=e=>{
+  const b=e.currentTarget;
+  if(tosc){tosc.stop();tosc=null;b.textContent='▶ Play Tone';b.setAttribute('aria-pressed','false');return}
+  const c=ac(),o=c.createOscillator(),gn=c.createGain();
+  o.frequency.value=hz(+$('#tSl').value);gn.gain.value=.1;o.connect(gn).connect(c.destination);o.start();tosc=o;
+  b.textContent='⏹ Stop Tone';b.setAttribute('aria-pressed','true')};
+// noise
+const nodes={};
+function noiseBuf(c,t){
+  const n=c.sampleRate*3,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0,last=0;
+  for(let i=0;i<n;i++){const w=Math.random()*2-1;
+    if(t==='white')d[i]=w*.5;
+    else if(t==='pink'){b0=.99886*b0+w*.0555179;b1=.99332*b1+w*.0750759;b2=.969*b2+w*.153852;b3=.8665*b3+w*.3104856;b4=.55*b4+w*.5329522;b5=-.7616*b5-w*.016898;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11;b6=w*.115926}
+    else{last=(last+.02*w)/1.02;d[i]=last*3.5}}
+  return b}
+document.querySelectorAll('#nBtns button').forEach(b=>b.onclick=()=>{
+  const t=b.dataset.n;
+  if(nodes[t]){nodes[t].stop();delete nodes[t];b.setAttribute('aria-pressed','false');b.classList.remove('btn-p');return}
+  const c=ac(),s=c.createBufferSource(),gn=c.createGain();
+  s.buffer=noiseBuf(c,t);s.loop=true;gn.gain.value=.25;s.connect(gn).connect(c.destination);s.start();
+  nodes[t]=s;b.setAttribute('aria-pressed','true');b.classList.add('btn-p')});
+// phase
+const pc=$('#pc'),pg=pc.getContext('2d');
+function phase(){
+  const deg=+$('#pSl').value,ph=deg*Math.PI/180,w=pc.width,h=pc.height,A=h/6;
+  $('#pV').textContent=deg+'°';$('#pR').textContent=Math.round(Math.abs(2*Math.cos(ph/2))*50)+'%';
+  pg.fillStyle='#0F172A';pg.fillRect(0,0,w,h);
+  [[0,'#06B6D4',1],[ph,'#8B5CF6',1],[null,'#F8FAFC',2]].forEach(([p,col,k])=>{
+    pg.strokeStyle=col;pg.lineWidth=k;pg.beginPath();
+    for(let x=0;x<=w;x++){const t=x/w*Math.PI*4;
+      const v=p===null?(Math.sin(t)+Math.sin(t+ph))/2*1.2:Math.sin(t+p);
+      const y=h/2-v*A*1.4;x?pg.lineTo(x,y):pg.moveTo(x,y)}
+    pg.stroke()})}
+$('#pSl').oninput=phase;phase();
+
+/* ---------- Live Audio Lab ---------- */
+const lc1=$('#l1a'),lg1=lc1.getContext('2d'),lc2=$('#l1b'),lg2=lc2.getContext('2d'),lc3=$('#l3c'),lg3=lc3.getContext('2d');
+let lt=0,lan=null,lcur=null,lsrc=null,hosc=null;
+const LC={white:'#06B6D4',pink:'#8B5CF6',brown:'#F59E0B'};
+function lw(g,c,ph,col,A){g.strokeStyle=col;g.lineWidth=3;g.beginPath();for(let x=0;x<=c.width;x++){const y=c.height/2-Math.sin(x/c.width*Math.PI*4+lt+ph)*A;x?g.lineTo(x,y):g.moveTo(x,y)}g.stroke()}
+function labFrame(){
+  lt+=.04;const deg=+$('#lSl').value,ph=deg*Math.PI/180,A=lc1.height*.2;
+  $('#lPh').textContent=deg+'°';
+  lg1.fillStyle='#0F172A';lg1.fillRect(0,0,lc1.width,lc1.height);lw(lg1,lc1,0,'#06B6D4',A);lw(lg1,lc1,ph,'#8B5CF6',A);
+  lg2.fillStyle='#0F172A';lg2.fillRect(0,0,lc2.width,lc2.height);
+  lg2.strokeStyle='#F8FAFC';lg2.lineWidth=3;lg2.beginPath();
+  for(let x=0;x<=lc2.width;x++){const a=x/lc2.width*Math.PI*4+lt,y=lc2.height/2-(Math.sin(a)+Math.sin(a+ph))*A;x?lg2.lineTo(x,y):lg2.moveTo(x,y)}lg2.stroke();
+  const r=Math.abs(Math.cos(ph/2));
+  $('#lRes').textContent=r<.01?'Flat line: 0% noise. Silence! 🤫':Math.round(r*100)+'% of the original noise';
+  const w=lc3.width,h=lc3.height,N=48,bw=w/N;
+  lg3.fillStyle='#0F172A';lg3.fillRect(0,0,w,h);
+  if(lan&&lcur){
+    const d=new Uint8Array(lan.frequencyBinCount),nyq=lan.context.sampleRate/2;lan.getByteFrequencyData(d);lg3.fillStyle=LC[lcur];
+    for(let i=0;i<N;i++){const f0=40*Math.pow(400,i/N),f1=40*Math.pow(400,(i+1)/N),b0=Math.floor(f0/nyq*d.length),b1=Math.max(b0+1,Math.floor(f1/nyq*d.length));let m=0;for(let b=b0;b<b1;b++)m=Math.max(m,d[b]);const bh=m/255*h;lg3.fillRect(i*bw+1,h-bh,bw-2,bh)}
+  }else{
+    [['white',t=>.65],['pink',t=>.8-.4*t],['brown',t=>.9-.8*t]].forEach(([k,fn],j)=>{lg3.strokeStyle=LC[k];lg3.lineWidth=3;lg3.beginPath();for(let i=0;i<=N;i++){const y=h-fn(i/N)*h*.9;i?lg3.lineTo(i*bw,y):lg3.moveTo(0,y)}lg3.stroke();lg3.fillStyle=LC[k];lg3.font='14px sans-serif';lg3.fillText(k,8,18+j*16)});
+    lg3.fillStyle='#94A3B8';lg3.fillText('Press a button to hear it and see the live spectrum',w/2-170,h-8)}
+  requestAnimationFrame(labFrame)}
+labFrame();
+document.querySelectorAll('#lnB button').forEach(b=>b.onclick=()=>{
+  const t=b.dataset.n,was=lcur===t;
+  if(lsrc){lsrc.stop();lsrc=null}lcur=null;
+  document.querySelectorAll('#lnB button').forEach(x=>{x.classList.remove('btn-p');x.setAttribute('aria-pressed','false')});
+  if(was)return;
+  const c=ac();if(!lan){lan=c.createAnalyser();lan.fftSize=2048;lan.connect(c.destination)}
+  const s=c.createBufferSource(),gn=c.createGain();s.buffer=noiseBuf(c,t);s.loop=true;gn.gain.value=.25;s.connect(gn).connect(lan);s.start();
+  lsrc=s;lcur=t;b.classList.add('btn-p');b.setAttribute('aria-pressed','true')});
+const HB=[['Speech 85-255 Hz',85,255,'#8B5CF6'],['Piano 27.5-4,186 Hz',27.5,4186,'#06B6D4'],['Ears most sensitive 2-5 kHz',2000,5000,'#F59E0B'],['Human hearing 20-20,000 Hz',20,20000,'#475569']];
+const pos=f=>Math.log(f/20)/Math.log(1000)*100,hhz=v=>Math.round(20*Math.pow(1000,v/1000));
+$('#hBars').innerHTML=HB.map(b=>'<div class="mb-2"><div class="text-xs mb-1">'+b[0]+'</div><div class="relative h-3 bg-bg rounded"><div class="absolute h-3 rounded" style="left:'+pos(b[1])+'%;width:'+(pos(b[2])-pos(b[1]))+'%;background:'+b[3]+'"></div></div></div>').join('')+'<div id="hCur" class="absolute top-0 bottom-0 w-0.5 bg-ink"></div>';
+$('#hTicks').innerHTML=[20,100,1000,10000,20000].map(f=>'<span class="absolute" style="left:'+pos(f)+'%;transform:translateX(-50%)">'+(f>=1000?f/1000+'k':f)+' Hz</span>').join('');
+function hUpd(){const f=hhz(+$('#hSl').value);$('#hHz').textContent=f+' Hz';$('#hCur').style.left=pos(f)+'%';
+  $('#hNote').textContent=f<85?'Deep bass, below most speech':f<=255?'Inside the human speech range':f<=4186?'Piano range and voice detail':f<=16000?'Bright treble':'Very high: many adults cannot hear this';
+  if(hosc)hosc.frequency.setTargetAtTime(f,hosc.context.currentTime,.02)}
+$('#hSl').oninput=hUpd;hUpd();
+function copyCode(id,b){const el=$('#'+id),sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)},ok=m=>{b.textContent=m;setTimeout(()=>b.textContent='Copy',2000)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.textContent).then(()=>ok('Copied ✅'),()=>{sel();ok('Selected: press Ctrl+C')});else{sel();ok('Selected: press Ctrl+C')}}
+$('#hBtn').onclick=e=>{const b=e.currentTarget;
+  if(hosc){hosc.stop();hosc=null;b.textContent='▶ Play Tone';b.setAttribute('aria-pressed','false');return}
+  const c=ac(),o=c.createOscillator(),gn=c.createGain();o.frequency.value=hhz(+$('#hSl').value);gn.gain.value=.08;o.connect(gn).connect(c.destination);o.start();hosc=o;
+  b.textContent='⏹ Stop Tone';b.setAttribute('aria-pressed','true')};
+</script>
+</body>
+</html>
